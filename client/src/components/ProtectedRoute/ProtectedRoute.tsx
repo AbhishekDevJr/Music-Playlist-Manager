@@ -7,6 +7,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const verifyUserAPI = async () => {
         try {
@@ -21,22 +22,25 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             const userAuthVerifyJson = await userAuthVerify.json();
 
             if (userAuthVerifyJson?.title === 'User Authenticated' && userAuthVerifyJson?.authenticated) {
-                console.log('Verified------------>');
                 setIsUserAuthenticated(true);
-            }
-            else {
+            } else {
                 setIsUserAuthenticated(false);
             }
-
         } catch (e) {
-            console.log(e);
+            console.error(e);
             setIsUserAuthenticated(false);
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         verifyUserAPI();
-    }, [])
+    }, []);
+
+    if (isLoading) {
+        return <div>Verifying User Authentication...</div>;
+    }
 
     return isUserAuthenticated ? children : <Navigate to="/" />;
 };
