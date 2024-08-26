@@ -11,9 +11,9 @@ exports.index = asyncHandler((req, res, next) => {
     });
 });
 
+//Verifies User Token
 exports.verifyToken = asyncHandler((req, res, next) => {
     const token = req?.cookies?.token;
-    console.log('Token-------->', token);
 
     if (!token) {
         return res.status(401).json({

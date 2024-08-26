@@ -4,6 +4,8 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import Home from './components/Home/Home'
 import Register from './components/Register/Register'
 import Signin from './components/Signin/Signin'
+import Dashboard from './components/Dashboard/Dashboard'
+import SidebarLayout from './components/SidebarLayout/SidebarLayout';
 
 function App() {
   return (
@@ -21,29 +23,17 @@ function App() {
           }
         />
         <Route
-          path="/dashboard"
+          path="/"
           element={
             <ProtectedRoute>
-              <>Dashboard Route</>
+              <SidebarLayout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/explore"
-          element={
-            <ProtectedRoute>
-              <>Songs Explore Route</>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user-playlist"
-          element={
-            <ProtectedRoute>
-              <>User Playlist Route</>
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="explore" element={<>Songs Explore Route</>} />
+          <Route path="profile" element={<>Profile Route</>} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )

@@ -4,6 +4,7 @@ const UserModel = require('../Models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const PlaylistModel = require('../Models/playlist');
 
 exports.index = asyncHandler(async (req, res, next) => {
 
@@ -17,6 +18,7 @@ exports.index = asyncHandler(async (req, res, next) => {
     });
 });
 
+//User Register Controller
 exports.register = asyncHandler(async (req, res, next) => {
     try {
         if (req?.body?.firstName && req?.body?.lastName && req?.body?.email && req?.body?.password) {
@@ -54,6 +56,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     }
 });
 
+//User Auth Controller
 exports.signin = asyncHandler(async (req, res, next) => {
     try {
         if (req?.body?.email && req?.body?.password) {
@@ -104,6 +107,130 @@ exports.signin = asyncHandler(async (req, res, next) => {
     }
 });
 
+//Controller that manages Playlist Creation
+exports.createPlaylist = asyncHandler(async (req, res, next) => {
+    try {
+        const token = req?.cookies?.token;
+        const decoded = jwt.verify(token, process.env.JWT_KEY);
+        const currUserName = decoded?.email;
+        if (req?.body?.title && currUserName) {
+            const userObj = await UserModel.findOne({ email: currUserName });
+
+            const userPlaylists = await PlaylistModel.find({ createdBy: userObj?.id });
+
+            if (userPlaylists?.some((item) => item.title === req?.body?.title)) {
+                res.status(200).json({
+                    title: 'Playlist Exists',
+                    msg: 'Playlist with this title already exists.'
+                });
+            }
+            else {
+                const newPlaylist = new PlaylistModel({
+                    title: req?.body?.title,
+                    description: req?.body?.description,
+                    createdBy: userObj?._id,
+                    createdAt: Date.now(),
+                    songs: req?.body?.songs
+                });
+
+                newPlaylist.save();
+
+                res.status(200).json({
+                    title: 'Playlist Created',
+                    msg: 'Playlist successfully created.'
+                });
+            }
+        }
+        else {
+            res.status(400).json({
+                title: 'Bad Request',
+                msg: 'Bad Request Payload.'
+            });
+        }
+    }
+    catch (err) {
+        res.status(500).json({
+            title: 'Unhandled Exception',
+            msg: `Unhandled Server Error. ${err?.message}`
+        });
+    }
+});
+
+//Controller that Retrieves Playlist Data
+exports.getPlaylists = asyncHandler(async (req, res, next) => {
+    try {
+        const token = req?.cookies?.token;
+        const decoded = jwt.verify(token, process.env.JWT_KEY);
+        const currUserName = decoded?.email;
+
+        if (currUserName) {
+            const userObj = await UserModel.findOne({ email: currUserName });
+            const userPlaylists = await PlaylistModel.find({ createdBy: userObj?.id });
+
+            res.status(200).json({
+                title: 'Total Playlists',
+                msg: 'Total Playlists for Current User',
+                email: currUserName,
+                playlists: userPlaylists,
+            });
+        }
+        else {
+            res.status(400).json({
+                title: 'Bad Request',
+                msg: 'Bad Request Payload',
+            });
+        }
+    }
+    catch (err) {
+        res.status(500).json({
+            title: 'Unhandled Exception',
+            msg: `Unhandled Server Error. ${err?.message}`
+        });
+    }
+});
+
+//Controller that Manages Playlist Record Deletion
+exports.deletePlaylist = asyncHandler(async (req, res, next) => {
+    try {
+        const token = req?.cookies?.token;
+        const decoded = jwt.verify(token, process.env.JWT_KEY);
+        const currUserName = decoded?.email;
+
+        if (currUserName && req?.body?.title) {
+            const userObj = await UserModel.findOne({ email: currUserName });
+
+            const playlistDel = await PlaylistModel.findOneAndDelete({ createdBy: userObj?._id, title: req?.body?.title });
+
+            if (playlistDel) {
+                res.status(200).json({
+                    title: 'Playlist Deleted',
+                    msg: 'Playlist Successfully Deleted.'
+                });
+            }
+            else {
+                res.status(500).json({
+                    title: 'Playlist Not Deleted',
+                    msg: 'Unable to Delete Playlist or Already Deleted.'
+                });
+            }
+
+        }
+        else {
+            res.status(400).json({
+                title: 'Bad Request',
+                msg: 'Bad Request Payload.'
+            });
+        }
+    }
+    catch (err) {
+        res.status(500).json({
+            title: 'Unhandled Exception',
+            msg: `Unhandled Server Error. ${err?.message}`
+        });
+    }
+});
+
+//Controller that manages User Signout
 exports.signout = asyncHandler(async (req, res, next) => {
     try {
         const jwtToken = req?.cookies.token;

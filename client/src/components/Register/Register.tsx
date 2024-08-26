@@ -4,6 +4,7 @@ import { TextField, Button, Box, Typography, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 interface User {
     id: number;
@@ -17,10 +18,12 @@ interface User {
 }
 
 const Register: React.FC = () => {
+    //Register Comp Control Variables
     const { control, handleSubmit, reset, formState: { errors } } = useForm<User>();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    //API that Manages User Registration
     const userRegisterAPI = async (reqBody: User) => {
         try {
             setIsLoading(true);
@@ -66,15 +69,35 @@ const Register: React.FC = () => {
             }
         } catch (e: unknown) {
             console.log(e);
+            console.log(e);
+            const error = e as Error;
+            console.log(error);
+            toast.error(`${error?.message}`, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
         }
     }
 
+    //Handles Register Form Submission
     const onSubmit = (data: User) => {
-        console.log('Submit Data--------->', data);
-
         if (data.password !== data.conPassword) {
-            //Use Toastify to alert user about password mismatch
-            alert('Password Mismatch!!!!');
+            toast.success(`Password & Confirm Password do not match!`, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
         }
         else {
             userRegisterAPI(data);
@@ -83,6 +106,7 @@ const Register: React.FC = () => {
 
     return (
         <>
+            <LoadingSpinner open={isLoading} />
             <ToastContainer
                 position="top-center"
                 autoClose={3000}
@@ -238,7 +262,7 @@ const Register: React.FC = () => {
                             />
                         </Grid>
                     </Grid>
-                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} style={{ marginInline: '4px', padding: '5px', background: '#333333', color: '#F5F5F5', borderRadius: '5px' }}>
                         Register
                     </Button>
                 </form>

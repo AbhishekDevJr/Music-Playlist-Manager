@@ -9,6 +9,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
+    //Verifies if the User is Authenticated to Protect Routes
     const verifyUserAPI = async () => {
         try {
             const userAuthVerify = await fetch(`${'http://localhost:5000'}/verify-token`, {
@@ -38,6 +39,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         verifyUserAPI();
     }, []);
 
+    //Halts Decision making till the VerifyUser Response has been received
     if (isLoading) {
         return <div>Verifying User Authentication...</div>;
     }

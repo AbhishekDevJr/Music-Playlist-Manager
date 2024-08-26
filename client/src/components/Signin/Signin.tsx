@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 interface SignInForm {
     email: string;
@@ -15,6 +17,7 @@ const Signin: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    //API to manages User Auth
     const userAuthAPI = async (reqBody: SignInForm) => {
         try {
             setIsLoading(true);
@@ -41,7 +44,7 @@ const Signin: React.FC = () => {
                     theme: "dark",
                 });
                 setIsLoading(false);
-                setTimeout(() => navigate('/users'), 2000);
+                setTimeout(() => navigate('/dashboard'), 2000);
             }
             else {
                 toast.error(`${userAuthParsed?.msg}`, {
@@ -59,17 +62,29 @@ const Signin: React.FC = () => {
         }
         catch (e: unknown) {
             console.log(e);
+            const error = e as Error;
+            console.log(error);
+            toast.error(`${error?.message}`, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
         }
     }
 
     //Form Submission Handler
     const onSubmit = (data: SignInForm) => {
-        console.log('Signin Submit--------->', data);
         userAuthAPI(data);
     };
 
     return (
         <>
+            <LoadingSpinner open={isLoading} />
             <ToastContainer
                 position="top-center"
                 autoClose={3000}
@@ -130,7 +145,7 @@ const Signin: React.FC = () => {
                                 helperText={errors.password ? errors.password.message : ""}
                             />}
                     />
-                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} style={{ marginInline: '4px', padding: '5px', background: '#333333', color: '#F5F5F5', borderRadius: '5px' }}>
                         Sign In
                     </Button>
                 </form>

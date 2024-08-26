@@ -32,15 +32,15 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.ORIGIN,
     credentials: true,
 }));
 
 app.use(cookieParser());
 
-
 app.use('/', indexRouter);
 app.use('/users', userRouter);
+
 
 //Initiating Server
 app.listen(process.env.PORT || 5000, () => console.log('Server Runnig on PORT : 5000'));
