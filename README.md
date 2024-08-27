@@ -2,7 +2,7 @@
 
 This repository hold the codebase for a Music Playlist Manager project. This project is essentially a CRUD Project on Playlists with User Authentication &amp; Authorization
 
-Instructions to Run this Project Locally :
+Instructions to Run this Project Locally:
 
 1. Git Clone This Repository
 2. Install Dependencies for Both Client & Server directories using yarn || npm install
