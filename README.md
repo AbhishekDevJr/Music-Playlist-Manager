@@ -2,6 +2,12 @@
 
 This repository hold the codebase for a Music Playlist Manager project. This project is essentially a CRUD Project on Playlists with User Authentication &amp; Authorization
 
+<h1><a href = "https://music-playlist-manager.vercel.app">Live Demo</a></h1>
+
+Demo User :- 
+Email :- abhi@gmail.com
+Pass :- abhi
+
 Instructions to Run this Project Locally:
 
 1. Git Clone This Repository
@@ -16,4 +22,4 @@ Instructions to Run this Project Locally:
    JWT_KEY = Any Secret String
    ORIGIN = 'http://localhost:5173' (Client Running Port)
 
-4. Note : Contact me if you have any Queries while running this project. I will be hosting this on Prod ENV Soon.
+4. Note : Contact me if you have any Queries while running this project.
