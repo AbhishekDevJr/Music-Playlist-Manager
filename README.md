@@ -2,7 +2,7 @@
 
 This repository hold the codebase for a Music Playlist Manager project. This project is essentially a CRUD Project on Playlists with User Authentication &amp; Authorization
 
-<h1><a href = "https://music-playlist-manager.vercel.app">Live Demo</a></h1>
+<h1><a href = "https://music-playlist-manager.vercel.app" target="_blank">Live Demo</a></h1>
 
 Demo User :- 
 Email :- abhi@gmail.com
