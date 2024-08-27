@@ -41,7 +41,6 @@ app.use(cookieParser());
 app.use('/', indexRouter);
 app.use('/users', userRouter);
 
-
 //Initiating Server
 app.listen(process.env.PORT || 5000, () => console.log('Server Runnig on PORT : 5000'));
 
