@@ -14,6 +14,8 @@ router.get('/get-playlists', auth, userController.getPlaylists);
 
 router.delete('/delete-playlist', auth, userController.deletePlaylist);
 
+router.post('/edit-playlist', auth, userController.editPost);
+
 router.post('/logout', auth, userController.signout);
 
 module.exports = router;

@@ -27,7 +27,7 @@ const Register: React.FC = () => {
     const userRegisterAPI = async (reqBody: User) => {
         try {
             setIsLoading(true);
-            const userSubmit = await fetch(`${'http://localhost:5000'}/users/register`, {
+            const userSubmit = await fetch(`${import.meta.env.VITE_APP_BACK_END_URL}/users/register`, {
                 method: 'POST',
                 body: JSON.stringify(reqBody),
                 headers: {

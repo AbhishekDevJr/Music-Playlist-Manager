@@ -11,6 +11,7 @@ export type Playlist = {
     description: string;
     search: string;
     songs: Song[];
+    [key: string]: unknown;
 };
 
 export type PlaylistSubmit = {
@@ -35,3 +36,10 @@ export interface Track {
     album: Album;
     [key: string]: unknown;
 }
+
+export type PlaylistEdit = {
+    _id: string | undefined;
+    title: string;
+    description: string;
+    [key: string]: unknown;
+};

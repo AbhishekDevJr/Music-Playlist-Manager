@@ -9,6 +9,7 @@ Instructions to Run this Project Locally :
 3. Set Client Env as :
    VITE_APP_CLIENT_ID = Your Spotify ClientID
    VITE_APP_CLIENT_SECRET = Your Spotify Client Secret
+   VITE_APP_BACK_END_URL = Server Project Domain (eg: http://localhost:5000)
 
    Set Server Env as :
    MONGO_CONNECTION_STRING = Your MongoDB Connection URL

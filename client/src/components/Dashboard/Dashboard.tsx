@@ -21,7 +21,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { getSpotifyAccessToken } from '../../utils/commonFunctions';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Playlist, PlaylistSubmit, Song, Track } from '../../constants/types';
+import { Playlist, PlaylistEdit, PlaylistSubmit, Song, Track } from '../../constants/types';
 
 const columns = [
     {
@@ -64,6 +64,8 @@ const Dashboard: React.FC = () => {
     } | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [playlistToDelete, setPlaylistToDelete] = useState<{ title: string } | null>(null);
+    const [editPlaylistModal, setEditPlaylistModal] = useState<boolean>(false);
+    const [currEditPlaylist, setCurrEditPlaylist] = useState<PlaylistEdit>();
 
     //Handles Playlist View Action
     const handleView = (playlist: {
@@ -81,10 +83,21 @@ const Dashboard: React.FC = () => {
         setDeleteModalOpen(true);
     };
 
+    //Edit Modal Handlers
+    const handleEditModalOpen = (row: PlaylistEdit) => {
+        setCurrEditPlaylist(row);
+        setEditPlaylistModal(true);
+    }
+
+    const handleEditClose = () => {
+        setCurrEditPlaylist(undefined);
+        setEditPlaylistModal(false);
+    }
+
     //Fetches List of all the Playlists Created by the Current User
     const getAllPlaylistsAPI = async () => {
         try {
-            const allCurrUserPlaylists = await fetch(`${'http://localhost:5000'}/users/get-playlists`, {
+            const allCurrUserPlaylists = await fetch(`${import.meta.env.VITE_APP_BACK_END_URL}/users/get-playlists`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -104,7 +117,7 @@ const Dashboard: React.FC = () => {
     //Creates a new Playlist for the Current User
     const createPlaylistAPI = async (reqBody: Playlist) => {
         try {
-            const creatPlaylist = await fetch(`${'http://localhost:5000'}/users/create-playlist`, {
+            const creatPlaylist = await fetch(`${import.meta.env.VITE_APP_BACK_END_URL}/users/create-playlist`, {
                 method: 'POST',
                 body: JSON.stringify(reqBody),
                 headers: {
@@ -125,6 +138,7 @@ const Dashboard: React.FC = () => {
                     progress: undefined,
                     theme: "dark",
                 });
+                getAllPlaylistsAPI();
                 reset();
                 handleClose();
             }
@@ -174,7 +188,7 @@ const Dashboard: React.FC = () => {
     //Deletes the playlist for Current User
     const deletePlaylistAPI = async (reqBody: { title: string | undefined }) => {
         try {
-            const deletePlaylist = await fetch(`${'http://localhost:5000'}/users/delete-playlist`, {
+            const deletePlaylist = await fetch(`${import.meta.env.VITE_APP_BACK_END_URL}/users/delete-playlist`, {
                 method: 'DELETE',
                 body: JSON.stringify(reqBody),
                 headers: {
@@ -195,6 +209,7 @@ const Dashboard: React.FC = () => {
                     progress: undefined,
                     theme: "dark",
                 });
+                getAllPlaylistsAPI();
             }
             else {
                 toast.error(`${deletePlaylistJson?.msg}`, {
@@ -222,6 +237,67 @@ const Dashboard: React.FC = () => {
                 progress: undefined,
                 theme: "dark",
             });
+        }
+    }
+
+    //Manages Playlist Edit for Curr User
+    const editPlaylistAPI = async (reqBody: PlaylistEdit) => {
+        try {
+            const editPlaylist = await fetch(`${import.meta.env.VITE_APP_BACK_END_URL}/users/edit-playlist`, {
+                method: 'POST',
+                body: JSON.stringify(reqBody),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+                credentials: 'include',
+            });
+            const editPlaylistJson = await editPlaylist.json();
+
+            if (editPlaylistJson?.title === 'Playlist Edited') {
+                toast.success(`${editPlaylistJson?.msg}`, {
+                    position: "top-center",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+                getAllPlaylistsAPI();
+                setEditPlaylistModal(false);
+                setCurrEditPlaylist(undefined);
+            }
+            else {
+                toast.info(`${editPlaylistJson?.msg}`, {
+                    position: "top-center",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+                setEditPlaylistModal(false);
+                setCurrEditPlaylist(undefined);
+            }
+
+        } catch (e) {
+            const error = e as Error;
+            console.log(error);
+            toast.error(`${error?.message}`, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
+            setEditPlaylistModal(false);
+            setCurrEditPlaylist(undefined);
         }
     }
 
@@ -285,6 +361,10 @@ const Dashboard: React.FC = () => {
         console.log('New Playlist:', data, formData);
     };
 
+    const onEditSubmit = (data: PlaylistSubmit) => {
+        editPlaylistAPI({ ...data, _id: currEditPlaylist?._id });
+    }
+
     //Restricts Song Duplication if user tries to add same song multiple times
     const handleAddSong = (song: { title: string, artist: string, album: string }) => {
         if (addedSongs.some((item) => item.title === song.title && item.artist === song.artist)) {
@@ -308,18 +388,26 @@ const Dashboard: React.FC = () => {
         deletePlaylistAPI({ title });
     }
 
-    //UseEffects that Updates the Playlist Data in case Changes are made
+    //Fetches All Current User Playlists on Comp Mount
     useEffect(() => {
-        if (!addPlaylistModal) {
-            getAllPlaylistsAPI();
-        }
-    }, [addPlaylistModal]);
+        getAllPlaylistsAPI();
+    }, []);
 
+    //Resets Form Instance
     useEffect(() => {
-        if (!deleteModalOpen) {
-            getAllPlaylistsAPI();
+        if (editPlaylistModal) {
+            reset({
+                title: currEditPlaylist?.title,
+                description: currEditPlaylist?.description,
+            });
         }
-    }, [deleteModalOpen]);
+        else {
+            reset({
+                title: '',
+                description: '',
+            });
+        }
+    }, [currEditPlaylist, reset, editPlaylistModal]);
 
     return (
         <>
@@ -412,6 +500,13 @@ const Dashboard: React.FC = () => {
                                                     color="secondary"
                                                     size="small"
                                                     sx={{ mr: 1, textTransform: 'none' }}
+                                                    onClick={
+                                                        () => handleEditModalOpen({
+                                                            _id: row._id as string,
+                                                            title: row.title,
+                                                            description: row.description,
+                                                            songs: row.songs || [],
+                                                        })}
                                                 >
                                                     Edit
                                                 </Button>
@@ -624,6 +719,59 @@ const Dashboard: React.FC = () => {
                             color="secondary"
                         >
                             Cancel
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Dialog
+                    open={editPlaylistModal}
+                    onClose={handleEditClose}
+                    maxWidth="lg"
+                    fullWidth
+                >
+                    <DialogTitle>Edit Playlist</DialogTitle>
+                    <DialogContent>
+                        <Controller
+                            name="title"
+                            control={control}
+                            rules={{ required: 'Title Field is required' }}
+                            defaultValue={currEditPlaylist?.title}
+                            render={({ field }) => (
+                                <div>
+                                    <TextField
+                                        {...field}
+                                        autoFocus
+                                        margin="dense"
+                                        label="Title"
+                                        fullWidth
+                                        variant="outlined"
+                                        error={!!errors.title}
+                                    />
+                                    {errors.title && <FormHelperText error>{errors.title.message}</FormHelperText>}
+                                </div>
+                            )}
+                        />
+                        <Controller
+                            name="description"
+                            control={control}
+                            defaultValue={currEditPlaylist?.description}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    margin="dense"
+                                    label="Description"
+                                    fullWidth
+                                    variant="outlined"
+                                />
+                            )}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleEditClose} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSubmit(onEditSubmit)} color="primary">
+                            Submit
                         </Button>
                     </DialogActions>
                 </Dialog>

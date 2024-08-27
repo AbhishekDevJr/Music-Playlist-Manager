@@ -230,6 +230,50 @@ exports.deletePlaylist = asyncHandler(async (req, res, next) => {
     }
 });
 
+//Controller that Manages Playlist Record Updation
+exports.editPost = asyncHandler(async (req, res, next) => {
+    try {
+        const token = req?.cookies?.token;
+        const decoded = jwt.verify(token, process.env.JWT_KEY);
+        const currUserName = decoded?.email;
+
+        if (currUserName && req?.body?.title && req?.body?.description && req?.body?._id) {
+            const userObj = await UserModel.findOne({ email: currUserName });
+            const playlistEdit = await PlaylistModel.findOne({ _id: req?.body?._id });
+
+            if (playlistEdit) {
+                playlistEdit.title = req?.body?.title;
+                playlistEdit.description = req?.body?.description;
+
+                await playlistEdit.save();
+
+                res.status(200).json({
+                    title: 'Playlist Edited',
+                    msg: 'Playlist has been Updated.'
+                });
+            }
+            else {
+                res.status(200).json({
+                    title: 'Playlist Not Found',
+                    msg: 'Requested Playlist was not Found'
+                });
+            }
+        }
+        else {
+            res.status(400).json({
+                title: 'Bad Request',
+                msg: 'Bad Request Payload'
+            });
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            title: `Unhandled Exception`,
+            msg: `Unhandled Server Error.`
+        });
+    }
+});
+
 //Controller that manages User Signout
 exports.signout = asyncHandler(async (req, res, next) => {
     try {

@@ -12,7 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     //Verifies if the User is Authenticated to Protect Routes
     const verifyUserAPI = async () => {
         try {
-            const userAuthVerify = await fetch(`${'http://localhost:5000'}/verify-token`, {
+            const userAuthVerify = await fetch(`${import.meta.env.VITE_APP_BACK_END_URL}/verify-token`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',

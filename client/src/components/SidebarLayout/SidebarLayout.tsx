@@ -9,7 +9,7 @@ const SidebarLayout: React.FC = () => {
     //API that manages User Logout
     const handleUserLogout = async () => {
         try {
-            const userLogout = await fetch(`${'http://localhost:5000'}/users/logout`, {
+            const userLogout = await fetch(`${import.meta.env.VITE_APP_BACK_END_URL}/users/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',

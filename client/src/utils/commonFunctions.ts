@@ -1,7 +1,7 @@
 //Spotify API that Generates User Token for Further Spotify API Calls
 export const getSpotifyAccessToken = async () => {
-    const clientId = import.meta.env.REACT_APP_CLIENT_ID;
-    const clientSecret = import.meta.env.REACT_APP_CLIENT_SECRET;
+    const clientId = import.meta.env.VITE_APP_CLIENT_ID;
+    const clientSecret = import.meta.env.VITE_APP_CLIENT_SECRET;
 
     const token = btoa(`${clientId}:${clientSecret}`);
 
