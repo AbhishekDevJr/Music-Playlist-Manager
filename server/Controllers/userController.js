@@ -69,7 +69,6 @@ exports.signin = asyncHandler(async (req, res, next) => {
                     const token = jwt.sign({ email: userExists?.email, firstName: userExists?.firstName, lastName: userExists?.lastName }, process.env.JWT_KEY, { expiresIn: '1H' });
 
                     res.status(200).cookie('token', token, {
-                        domain: 'vercel.app',
                         path: '/',
                         sameSite: 'none',
                         httpOnly: true,
@@ -282,7 +281,6 @@ exports.signout = asyncHandler(async (req, res, next) => {
 
         if (jwtToken) {
             res.clearCookie('token', {
-                domain: 'vercel.app',
                 path: '/',
                 sameSite: 'none',
                 secure: true,
